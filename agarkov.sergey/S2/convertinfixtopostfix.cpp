@@ -99,4 +99,4 @@ agarkov::Queue< std::string > agarkov::convertInfixToPostfix(agarkov::Queue< std
   return postfixQueue;
 }
 
- 
+
