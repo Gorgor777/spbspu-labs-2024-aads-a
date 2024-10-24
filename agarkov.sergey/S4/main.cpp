@@ -1,9 +1,10 @@
 #include <iostream>
 #include "avltree.hpp"
+#include "tree.hpp"
 
 
 template<typename Key, typename Value>
-void inOrderTraversal(Tree<std::pair<Key, Value>>* node)
+void inOrderTraversal(agarkov::Tree<std::pair<Key, Value>>* node)
 {
   if (node)
   {
