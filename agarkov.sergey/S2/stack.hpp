@@ -2,7 +2,7 @@
 #define STACK_HPP
 
 #include <stdexcept>
-#include <list.hpp>
+#include <list>
 
 namespace agarkov
 {
@@ -10,37 +10,30 @@ namespace agarkov
   class Stack
   {
     public:
-      Stack();
-      ~Stack();
+      Stack() = default;
+      ~Stack() = default;
       Stack(const Stack< T >& other);
       Stack< T >& operator=(const Stack< T >& other);
-      Stack(Stack< T >&& other);
-      Stack< T >& operator=(Stack< T >&& other);
+      Stack(Stack< T >&& other) noexcept;
+      Stack< T >& operator=(Stack< T >&& other) noexcept;
       void push(const T& value);
       void pop();
       T get() const;
       bool isEmpty() const;
-      void clear();
     private:
-      details::List< T >* top_;
+      std::list<T> data_;
   };
-
-  template< typename T >
-  Stack< T >::Stack():
-    top_(nullptr)
-  {}
 
   template< typename T >
   bool Stack< T >::isEmpty() const
   {
-    return (top_ == nullptr);
+    return data_.empty();
   }
 
   template< typename T >
   void Stack< T >::push(const T& value)
   {
-    details::List< T >* temp = new details::List< T >{value, top_};
-    top_ = temp;
+    data_.push_back(value);
   }
 
   template< typename T >
@@ -50,7 +43,7 @@ namespace agarkov
     {
       throw std::logic_error("Empty stack");
     }
-    return top_->data_;
+    return data_.back();
   }
 
   template< typename T >
@@ -60,35 +53,13 @@ namespace agarkov
     {
       throw std::logic_error("Empty stack");
     }
-    details::List< T >* temp = top_->next_;
-    delete top_;
-    top_ = temp;
-  }
-
-  template< typename T >
-  Stack< T >::~Stack()
-  {
-    clear();
+    data_.pop_back();
   }
 
   template< typename T >
   Stack< T >::Stack(const Stack< T >& other):
-    top_(nullptr)
+    data_(other.data_)
   {
-    try
-    {
-      details::List< T >* other_value = other.top_;
-      while (other_value != nullptr)
-      {
-        push(other_value->data_);
-        other_value = other_value->next_;
-      }
-    }
-    catch (...)
-    {
-      clear();
-      throw;
-    }
   }
 
   template< typename T >
@@ -96,36 +67,23 @@ namespace agarkov
   {
     if (this != std::addressof(other))
     {
-      Stack< T > temp(other);
-      std::swap(top_, other.top_);
+      data_ = other.data_;
     }
     return *this;
   }
 
   template< typename T >
-  Stack< T >::Stack(Stack< T >&& other):
-    top_(other.top_)
+  Stack< T >::Stack(Stack< T >&& other) noexcept:
+    data_(std::move(other.data_))
   {
-    other.top_ = nullptr;
   }
 
   template< typename T >
-  Stack< T >& Stack< T >::operator=(Stack< T >&& other)
+  Stack< T >& Stack< T >::operator=(Stack< T >&& other) noexcept
   {
     if (this != std::addressof(other))
     {
-      clear();
-      top_ = other.top_;
-      other.top_ = nullptr;
-    }
-  }
-
-  template < typename T >
-  void Stack< T >::clear()
-  {
-    while (!isEmpty())
-    {
-      pop();
+      data_ = std::move(other.data_);
     }
   }
 }
