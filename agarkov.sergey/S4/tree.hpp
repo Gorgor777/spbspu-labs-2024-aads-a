@@ -9,9 +9,9 @@ namespace agarkov
   struct Tree
   {
     T data_;
-    Tree< T >* left_ = nullptr;
-    Tree< T >* head_ = nullptr;
-    Tree< T >* right_ = nullptr;
+    Tree< T >* left_;
+    Tree< T >* head_;
+    Tree< T >* right_;
     size_t height_ = 0;
   };
 
@@ -42,9 +42,8 @@ namespace agarkov
     {
       return tree;
     }
-    return getMax(tree->left_);
+    return getMin(tree->left_);
   }
-
 
 }
 

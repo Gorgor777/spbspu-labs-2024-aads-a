@@ -21,7 +21,7 @@ namespace agarkov
       AVLTreeIterator();
       explicit AVLTreeIterator(Tree< data_t >* rhs);
       AVLTreeIterator< Key, Value, Compare >& operator++();
-      Key& operator*();
+      Value& operator*();
       ~AVLTreeIterator() = default;
     private:
       Tree< data_t >* ptr_;
@@ -60,10 +60,11 @@ namespace agarkov
   }
 
   template< typename Key, typename Value, typename Compare >
-  Key& AVLTreeIterator< Key, Value, Compare >::operator*()
+  Value& AVLTreeIterator< Key, Value, Compare >::operator*()
   {
     return ptr_->data_.second;
   }
+
 }
 
 #endif
