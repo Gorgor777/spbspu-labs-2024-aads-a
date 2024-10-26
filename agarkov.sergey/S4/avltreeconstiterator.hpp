@@ -2,6 +2,9 @@
 #define AVLTREECONSTITERATOR
 
 #include <utility>
+#include <memory>
+
+#include "tree.hpp"
 
 namespace agarkov
 {
@@ -28,8 +31,8 @@ namespace agarkov
       AVLTreeConstIterator< Key, Value, Compare > operator++(int);
       AVLTreeConstIterator< Key, Value, Compare >& operator--();
       AVLTreeConstIterator< Key, Value, Compare > operator--(int);
-      const Value& operator*();
-      const Value* operator->();
+      const data_t& operator*();
+      const data_t* operator->();
       bool operator==(const AVLTreeConstIterator< Key, Value, Compare >& rhs) const;
       bool operator!=(const AVLTreeConstIterator< Key, Value, Compare >& rhs) const;
       ~AVLTreeConstIterator() = default;
@@ -83,6 +86,56 @@ namespace agarkov
     return temp;
   }
 
+  template< typename Key, typename Value, typename Compare >
+  AVLTreeConstIterator< Key, Value, Compare >& AVLTreeConstIterator< Key, Value, Compare >::operator--()
+  {
+    if (ptr_->left_)
+    {
+      ptr_ = getMax(ptr_->left_);
+    }
+    else
+    {
+      Tree< data_t >* parent = ptr_->head_;
+      while (parent && (ptr_ == parent->left_))
+      {
+        ptr_ = parent;
+        parent = parent->head_;
+      }
+      ptr_ = parent;
+    }
+    return *this;
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  AVLTreeConstIterator< Key, Value, Compare > AVLTreeConstIterator< Key, Value, Compare >::operator--(int)
+  {
+    AVLTreeIterator< Key, Value, Compare > temp(*this);
+    --(*this);
+    return temp;
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  const typename AVLTreeConstIterator< Key, Value, Compare >::data_t& AVLTreeConstIterator< Key, Value, Compare >::operator*()
+  {
+    return ptr_->data_;
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  const typename AVLTreeConstIterator< Key, Value, Compare >::data_t* AVLTreeConstIterator< Key, Value, Compare >::operator->()
+  {
+    return std::addressof(ptr_->data_);
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  bool AVLTreeConstIterator< Key, Value, Compare >::operator==(const AVLTreeConstIterator< Key, Value, Compare >& rhs) const
+  {
+    return ptr_ == rhs.ptr_;
+  }
+  template< typename Key, typename Value, typename Compare >
+  bool AVLTreeConstIterator< Key, Value, Compare >::operator!=(const AVLTreeConstIterator< Key, Value, Compare >& rhs) const
+  {
+    return ptr_ != rhs.ptr_;
+  }
 }
 
 #endif

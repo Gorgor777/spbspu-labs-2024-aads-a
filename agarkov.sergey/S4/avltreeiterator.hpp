@@ -2,11 +2,13 @@
 #define AVLTREEITERATOR_HPP
 
 #include <utility>
+#include <memory>
 
 #include "tree.hpp"
+
 namespace agarkov
 {
-  template< typename T >
+  template< typename T  >
   class Tree;
 
   template< typename Key, typename Value, typename Compare >
@@ -29,8 +31,8 @@ namespace agarkov
       AVLTreeIterator< Key, Value, Compare > operator++(int);
       AVLTreeIterator< Key, Value, Compare >& operator--();
       AVLTreeIterator< Key, Value, Compare > operator--(int);
-      Value& operator*();
-      Value* operator->();
+      data_t& operator*();
+      data_t* operator->();
       bool operator==(const AVLTreeIterator< Key, Value, Compare >& rhs) const;
       bool operator!=(const AVLTreeIterator< Key, Value, Compare >& rhs) const;
       ~AVLTreeIterator() = default;
@@ -113,15 +115,15 @@ namespace agarkov
   }
 
   template< typename Key, typename Value, typename Compare >
-  Value& AVLTreeIterator< Key, Value, Compare >::operator*()
+  typename AVLTreeIterator< Key, Value, Compare >::data_t& AVLTreeIterator< Key, Value, Compare >::operator*()
   {
-    return ptr_->data_.second;
+    return ptr_->data_;
   }
 
   template< typename Key, typename Value, typename Compare >
-  Value* AVLTreeIterator< Key, Value, Compare >::operator->()
+  typename AVLTreeIterator< Key, Value, Compare >::data_t* AVLTreeIterator< Key, Value, Compare >::operator->()
   {
-    return std::addressof(ptr_->data_.second);
+    return std::addressof(ptr_->data_);
   }
 
   template< typename Key, typename Value, typename Compare >
@@ -134,8 +136,6 @@ namespace agarkov
   {
     return ptr_ != rhs.ptr_;
   }
-
 }
 
 #endif
-
