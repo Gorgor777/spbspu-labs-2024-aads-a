@@ -14,39 +14,39 @@ namespace agarkov
   template< typename Key, typename Value, typename Compare = std::less< > >
   class AVLTree
   {
-  public:
-    using data_t = std::pair< Key, Value >;
-    using iterator = AVLTreeIterator< Key, Value, Compare >;
-    using const_iterator = AVLTreeConstIterator< Key, Value, Compare >;
-    AVLTree();
-    ~AVLTree();
-    AVLTree(const AVLTree& other);
-    AVLTree(AVLTree&& other) noexcept;
-    AVLTree& operator=(const AVLTree& other);
-    AVLTree& operator=(AVLTree&& other) noexcept;
-    void insert(const Key& key, const Value& value);
-    void erase(const Key& key);
-    void clear();
-    Value& at(const Key& key);
-    bool empty() const;
-    iterator begin();
-    const_iterator cbegin();
-    iterator end();
-    const_iterator cend();
-    Tree< data_t >* node_;
-    Compare comp_;
-  private:
-    void updateHeight(Tree< data_t >* tree);
-    Tree< data_t >* insert(const Key& key, const Value& value, Tree< data_t >* tree);
-    Tree< data_t >* find(const Key& key);
-    void erase(Tree< data_t >* tree);
-    void rotateLeft(Tree< data_t >* node);
-    void rotateRight(Tree< data_t >* node);
-    void rotateRightLeft(Tree< data_t >* node);
-    void rotateLeftRight(Tree< data_t >* node);
-    void balance(Tree< data_t >* node);
-    void clear(Tree< data_t >* node);
-    void copyNodes(const Tree< data_t >* source_node, Tree< data_t >* destination_node);
+    public:
+      using data_t = std::pair< Key, Value >;
+      using iterator = AVLTreeIterator< Key, Value, Compare >;
+      using const_iterator = AVLTreeConstIterator< Key, Value, Compare >;
+      AVLTree();
+      ~AVLTree();
+      AVLTree(const AVLTree& other);
+      AVLTree(AVLTree&& other) noexcept;
+      AVLTree& operator=(const AVLTree& other);
+      AVLTree& operator=(AVLTree&& other) noexcept;
+      void insert(const Key& key, const Value& value);
+      void erase(const Key& key);
+      void clear();
+      Value& at(const Key& key);
+      bool empty() const;
+      iterator begin();
+      const_iterator cbegin();
+      iterator end();
+      const_iterator cend();
+    private:
+      void updateHeight(Tree< data_t >* tree);
+      Tree< data_t >* insert(const Key& key, const Value& value, Tree< data_t >* tree);
+      Tree< data_t >* find(const Key& key);
+      void erase(Tree< data_t >* tree);
+      void rotateLeft(Tree< data_t >* node);
+      void rotateRight(Tree< data_t >* node);
+      void rotateRightLeft(Tree< data_t >* node);
+      void rotateLeftRight(Tree< data_t >* node);
+      void balance(Tree< data_t >* node);
+      void clear(Tree< data_t >* node);
+      void copyNodes(const Tree< data_t >* source_node, Tree< data_t >* destination_node);
+      Tree< data_t >* node_;
+      Compare comp_;
   };
 
   template< typename Key, typename Value, typename Compare >
@@ -65,12 +65,21 @@ namespace agarkov
 
   template< typename Key, typename Value, typename Compare >
   AVLTree< Key, Value, Compare >::AVLTree(const AVLTree& other):
-  comp_(other.comp_)
+    comp_(other.comp_)
   {
     if (other.node_)
     {
-      node_ = new Tree< data_t >();
-      copyNodes(other.node_, node_);
+      node_ = nullptr;
+      try
+      {
+        node_ = new Tree< data_t >();
+        copyNodes(other.node_, node_);
+      }
+      catch (...)
+      {
+        delete node_;
+        throw;
+      }
     }
     else
     {
@@ -92,12 +101,20 @@ namespace agarkov
     if (this != &other)
     {
       clear(node_);
-      delete node_;
 
       if (other.node_)
       {
-        node_ = new Tree< data_t >();
-        copyNodes(other.node_, node_);
+        node_ = nullptr;
+        try
+        {
+          node_ = new Tree< data_t >();
+          copyNodes(other.node_, node_);
+        }
+        catch (...)
+        {
+          delete node_;
+          throw;
+        }
       }
       else
       {
@@ -122,7 +139,6 @@ namespace agarkov
     }
     return *this;
   }
-
 
   template< typename Key, typename Value, typename Compare >
   void AVLTree< Key, Value, Compare >::insert(const Key& key, const Value& value)
@@ -177,16 +193,16 @@ namespace agarkov
   template< typename Key, typename Value, typename Compare >
   typename AVLTree< Key, Value, Compare >::iterator AVLTree< Key, Value, Compare >::end()
   {
-    return iterator(getMax(node_)->right_);
+    return iterator(nullptr);
   }
 
   template< typename Key, typename Value, typename Compare >
   typename AVLTree< Key, Value, Compare >::const_iterator AVLTree< Key, Value, Compare >::cend()
   {
-    return const_iterator(getMax(node_)->right_);
+    return const_iterator(nullptr);
   }
 
-  template<typename Key, typename Value, typename Compare>
+  template< typename Key, typename Value, typename Compare >
   void AVLTree<Key, Value, Compare>::updateHeight(Tree< data_t >* tree)
   {
     if (!tree)
@@ -196,24 +212,27 @@ namespace agarkov
     tree->height_ = 1 + std::max(getHeight(tree->left_), getHeight(tree->right_));
   }
 
-  template<typename Key, typename Value, typename Compare>
+  template< typename Key, typename Value, typename Compare >
   Tree< typename AVLTree< Key, Value, Compare >::data_t >* AVLTree< Key, Value, Compare >::insert(const Key& key,
       const Value & value, Tree< data_t >* tree)
   {
     if (!node_)
     {
-      node_ = new Tree< data_t >();
-      node_->data_ = data_t(key, value);
-      node_->height_ = 1;
+      node_ = new Tree< data_t >{data_t(key, value), nullptr, nullptr, nullptr, 1};
       return node_;
+    }
+
+    if (!comp_(tree->data_.first, key) && !comp_(key, tree->data_.first))
+    {
+      auto temp = find(key);
+      temp->data_.second = value;
+      return temp;
     }
     if (comp_(tree->data_.first, key))
     {
       if (!tree->right_)
       {
-        auto temp = new Tree< data_t >();
-        temp->data_ = data_t(key, value);
-        temp->height_ = 1;
+        auto temp = new Tree< data_t >{data_t(key, value), nullptr, nullptr, nullptr, 1};
         tree->right_ = temp;
         temp->head_ = tree;
         updateHeight(tree);
@@ -227,9 +246,7 @@ namespace agarkov
     {
       if (!tree->left_)
       {
-        auto temp = new Tree< data_t >();
-        temp->data_ = data_t(key, value);
-        temp->height_ = 1;
+        auto temp = new Tree< data_t >{data_t(key, value), nullptr, nullptr, nullptr, 1};
         tree->left_ = temp;
         temp->head_ = tree;
         updateHeight(tree);
@@ -254,8 +271,8 @@ namespace agarkov
     throw std::out_of_range("No such key in dictionary");
   }
 
-  template<typename Key, typename Value, typename Compare>
-  void AVLTree<Key, Value, Compare>::erase(Tree<typename AVLTree<Key, Value, Compare>::data_t>* tree)
+  template< typename Key, typename Value, typename Compare >
+  void AVLTree< Key, Value, Compare >::erase(Tree< typename AVLTree<Key, Value, Compare >::data_t> * tree)
   {
     if (!tree)
     {
@@ -314,8 +331,7 @@ namespace agarkov
     }
   }
 
-
-  template<typename Key, typename Value, typename Compare>
+  template< typename Key, typename Value, typename Compare >
   void AVLTree< Key, Value, Compare >::rotateLeft(Tree< data_t >* node)
   {
     Tree< data_t >* new_root = node->right_;
@@ -378,16 +394,16 @@ namespace agarkov
   }
 
   template< typename Key, typename Value, typename Compare >
-  void AVLTree< Key, Value, Compare >::rotateRightLeft(Tree< data_t >* node)
+  void AVLTree<Key, Value, Compare>::rotateRightLeft(Tree<data_t>* node)
   {
-    rotateRight(node);
+    rotateRight(node->right_);
     rotateLeft(node);
   }
 
   template< typename Key, typename Value, typename Compare >
-  void AVLTree< Key, Value, Compare >::rotateLeftRight(Tree< data_t >* node)
+  void AVLTree<Key, Value, Compare>::rotateLeftRight(Tree<data_t>* node)
   {
-    rotateLeft(node);
+    rotateLeft(node->left_);
     rotateRight(node);
   }
 
@@ -451,19 +467,34 @@ namespace agarkov
 
     if (source_node->left_)
     {
-      destination_node->left_ = new Tree< data_t >();
-      destination_node->left_->head_ = destination_node;
-      copyNodes(source_node->left_, destination_node->left_);
+      destination_node->left_ = nullptr;
+      try
+      {
+        destination_node->left_ = new Tree< data_t >();
+        destination_node->left_->head_ = destination_node;
+        copyNodes(source_node->left_, destination_node->left_);
+      }
+      catch(...)
+      {
+        delete destination_node->left_;
+      }
     }
 
     if (source_node->right_)
     {
-      destination_node->right_ = new Tree< data_t >();
-      destination_node->right_->head_ = destination_node;
-      copyNodes(source_node->right_, destination_node->right_);
+      destination_node->right_ = nullptr;
+      try
+      {
+        destination_node->right_ = new Tree< data_t >();
+        destination_node->right_->head_ = destination_node;
+        copyNodes(source_node->right_, destination_node->right_);
+      }
+      catch (...)
+      {
+        delete destination_node->right_;
+      }
     }
   }
 }
 
 #endif
- 
