@@ -1,12 +1,13 @@
 #include "commands.hpp"
 #include <string>
 #include <ostream>
+#include <utility>
 #include "avltree.hpp"
 
 namespace
 {
-  using dict_t = AVLTree< size_t, std::string >;
-  using main_dict = AVLTree< std::string, dict_t >;
+  using dict_t = agarkov::AVLTree< size_t, std::string >;
+  using main_dict = agarkov::AVLTree< std::string, dict_t >;
 }
 
 void agarkov::printDict(std::string name, main_dict& dict_of_dict, std::ostream& out)
