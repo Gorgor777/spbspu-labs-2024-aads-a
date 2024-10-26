@@ -18,6 +18,7 @@ namespace agarkov
       void insert(const Key& key, const Value& value);
       void erase(const Key& key);
       iterator begin();
+      iterator end();
       Tree< data_t >* node_;
       Compare comp_;
       void rotateLeft(Tree< data_t >* node);
@@ -51,6 +52,12 @@ namespace agarkov
   typename AVLTree< Key, Value, Compare >::iterator AVLTree< Key, Value, Compare >::begin()
   {
     return iterator(getMin(node_));
+  }
+
+  template< typename Key, typename Value, typename Compare >
+  typename AVLTree< Key, Value, Compare >::iterator AVLTree< Key, Value, Compare >::end()
+  {
+    return iterator(getMax(node_)->right_);
   }
 
   template<typename Key, typename Value, typename Compare>
@@ -222,6 +229,7 @@ namespace agarkov
       updateHeight(node);
       updateHeight(newRoot);
   }
+
 }
 
 #endif
