@@ -26,4 +26,3 @@ int main(int argc, char* argv[])
   agarkov::Commands dict_wiht_cmd;
   dict_wiht_cmd.runCommand(std::cin, std::cout, dict_of_dict);
 }
-

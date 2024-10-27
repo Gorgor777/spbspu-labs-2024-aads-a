@@ -33,6 +33,9 @@ namespace agarkov
       const_iterator cbegin();
       iterator end();
       const_iterator cend();
+      size_t count(const Key& key) const;
+      std::pair< iterator, iterator > equal_range( const Key& key );
+      std::pair< const_iterator, const_iterator > equal_range( const Key& key ) const;
     private:
       void updateHeight(Tree< data_t >* tree);
       Tree< data_t >* insert(const Key& key, const Value& value, Tree< data_t >* tree);
@@ -94,6 +97,21 @@ namespace agarkov
   {
     other.node_ = nullptr;
   }
+
+  template< typename Key, typename Value, typename Compare >
+  size_t AVLTree< Key, Value, Compare >::count(const Key& key) const
+  {
+    size_t count = 0;
+    for (auto i = cbegin(); i != cend(); i++)
+    {
+      if (i->first == key)
+      {
+        count++;
+      }
+    }
+    return count;
+  }
+
 
   template< typename Key, typename Value, typename Compare >
   AVLTree< Key, Value, Compare >& AVLTree< Key, Value, Compare >::operator=(const AVLTree& other)
