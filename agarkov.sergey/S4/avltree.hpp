@@ -132,7 +132,15 @@ namespace agarkov
     }
     return std::make_pair(first, last);
   }
-  //std::pair<const_iterator, const_iterator> equal_range( const Key& key ) const;
+
+  template< typename Key, typename Value, typename Compare >
+  typename AVLTree< Key, Value, Compare >::const_iterator_pair AVLTree< Key, Value, Compare >::equal_range(const Key& key) const
+  {
+    auto iter_pair = equal_range(key);
+    auto first = const_iterator(iter_pair->first);
+    auto last = const_iterator(iter_pair->second);
+    return std::make_pair(first, last);
+  }
 
   template< typename Key, typename Value, typename Compare >
   AVLTree< Key, Value, Compare >& AVLTree< Key, Value, Compare >::operator=(const AVLTree& other)
