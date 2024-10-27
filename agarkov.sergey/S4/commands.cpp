@@ -95,3 +95,25 @@ void agarkov::intersectDict(std::string name, std::string first, std::string sec
   }
 }
 
+void agarkov::unionDict(std::string name, std::string first, std::string second, main_dict& dict_of_dict)
+{
+  try
+  {
+    dict_t temp;
+    dict_t first_dict = dict_of_dict.at(first);
+    dict_t second_dict = dict_of_dict.at(second);
+    for (auto i = second_dict.begin(); i != second_dict.end(); i++)
+    {
+      temp.insert(i->first, i->second);
+    }
+    for (auto i = first_dict .begin(); i != first_dict.end(); i++)
+    {
+      temp.insert(i->first, i->second);
+    }
+    dict_of_dict.insert(name, temp);
+  }
+  catch (...)
+  {
+    throw;
+  }
+}
