@@ -18,6 +18,8 @@ namespace agarkov
       using data_t = std::pair< Key, Value >;
       using iterator = AVLTreeIterator< Key, Value, Compare >;
       using const_iterator = AVLTreeConstIterator< Key, Value, Compare >;
+      using iterator_pair = std::pair< iterator, iterator >;
+      using const_iterator_pair = std::pair< const_iterator, const_iterator >;
       AVLTree();
       ~AVLTree();
       AVLTree(const AVLTree& other);
@@ -34,7 +36,7 @@ namespace agarkov
       iterator end();
       const_iterator cend();
       size_t count(const Key& key) const;
-      std::pair< iterator, iterator > equal_range( const Key& key );
+      std::pair< iterator, iterator > equal_range(const Key& key);
       std::pair< const_iterator, const_iterator > equal_range( const Key& key ) const;
     private:
       void updateHeight(Tree< data_t >* tree);
@@ -112,6 +114,25 @@ namespace agarkov
     return count;
   }
 
+  template< typename Key, typename Value, typename Compare >
+  typename AVLTree< Key, Value, Compare >::iterator_pair  AVLTree< Key, Value, Compare >::equal_range(const Key& key)
+  {
+    auto first = begin();
+    auto last = end();
+    for (auto i = begin(); i != end() && key < i.first; i++)
+    {
+      if (i->first == key)
+      {
+        if (first == begin())
+        {
+          first = i;
+        }
+        last = i;
+      }
+    }
+    return std::make_pair(first, last);
+  }
+  //std::pair<const_iterator, const_iterator> equal_range( const Key& key ) const;
 
   template< typename Key, typename Value, typename Compare >
   AVLTree< Key, Value, Compare >& AVLTree< Key, Value, Compare >::operator=(const AVLTree& other)
