@@ -31,7 +31,7 @@ void agarkov::printDict(std::string name, main_dict& dict_of_dict, std::ostream&
     throw;
   }
 }
- 
+
 void agarkov::complementDict(std::string name, std::string first, std::string second, main_dict& dict_of_dict)
 {
   try
